@@ -55,6 +55,7 @@ public class SendMsgAsyncTask {
 		@Override
 		protected String doInBackground(Void... message) {
 			String result = "";
+
 				result = mBaiduPush.PushMessage(mMessage);
 
 			return result;

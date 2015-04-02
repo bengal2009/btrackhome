@@ -3,7 +3,6 @@ package com.blin.btrack.GPS;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -16,6 +15,10 @@ import com.baidu.mapapi.search.geocode.GeoCoder;
 /**
  * Created by Lin on 2015/3/29.
  * return Location Value
+ */
+/*
+bob->alice
+
  */
 public class CurLoc extends Activity {
     private LatLng CurPOI;
