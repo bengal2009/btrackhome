@@ -1,0 +1,381 @@
+package com.blin.btrack;
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.baidu.android.pushservice.PushManager;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.GeofenceClient;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.blin.btrack.GPS.LocationInfo;
+import com.google.gson.Gson;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+public class MainActivity extends Activity implements OnGetGeoCoderResultListener,SendMsgAsyncTask.OnSendScuessListener, SendTagMsgAsyncTask.OnSendTagScuessListener {
+
+    PushApplication app;
+    Gson mGson;
+    String curMsg;
+
+    //Baidu Location Service
+    public LocationInfo Curloc1=new LocationInfo();
+    private LatLng CurPOI;
+    private GeoCoder mSearch;
+    public LocationClient mLocationClient;
+    public GeofenceClient mGeofenceClient;
+    public MyLocationListener mMyLocationListener;
+    public String  mLocationResult;
+    public String LocationResult;
+    //Baidu Location Service Finish
+    BroadcastReceiver commReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra("onBind")) {
+                Bundle bindData = intent.getBundleExtra("onBind");
+                int errorCode = bindData.getInt("errorCode");
+                String bindString;
+                if (errorCode == 0) {
+                    bindString = " 用?Id: " + bindData.getString("userId") + "\n 通道Id: " + bindData.getString("channelId");
+                } else {
+                    bindString = "推送服?失?：" + errorCode;
+                    Toast.makeText(getApplicationContext(), "推送服?失?：" + errorCode,
+                            Toast.LENGTH_LONG).show();
+                }
+                ((TextView) findViewById(R.id.textView1)).append(bindString);
+
+            } else if (intent.hasExtra("onMessage")) {
+                String msgLine = "";
+                try {
+                    Message msg = (Message) intent.getSerializableExtra("onMessage");
+                    String userNumber = "(No." + msg.getUser_id().substring(msg.getUser_id().length() - 4) + ")";
+                    Timestamp tt = new Timestamp(msg.getTime_samp());
+                    msgLine = "收到消息" + tt.getHours() + ":" + tt.getMinutes()
+                            + "：" + userNumber + msg.getMessage() + "\n";
+                    Log.i("onmessage", "Onmessage start!");
+//                    ((TextView)findViewById(R.id.shmsg)).append(msgLine);
+                    Log.i("onReceive", msgLine);
+                } catch (Exception e) {
+                    msgLine = "收到消息" + intent.getStringExtra("onMessage") + "\n";
+
+                } finally {
+                    ((TextView) findViewById(R.id.textView2)).append(msgLine);
+                }
+
+            } else if (intent.hasExtra("onSetTags")) {
+                String info = intent.getStringExtra("onSetTags");
+                Log.i("onReceive", info);
+                ((TextView) findViewById(R.id.textView2)).append(info);
+            } else if (intent.hasExtra("onListTags")) {
+               /* String info = intent.getStringExtra("onListTags");
+                ((TextView)findViewById(R.id.textView2)).append(info);*/
+                Bundle bindData = intent.getBundleExtra("onListTags");
+                ArrayList<String> tagstr = bindData.getStringArrayList("tags");
+                app.setListTags(tagstr);
+                for (String s1 : tagstr) {
+                    ((TextView) findViewById(R.id.textView2)).append(s1 + "\n");
+
+                }
+
+
+            } else if (intent.hasExtra("onDelTags")) {
+                String info = intent.getStringExtra("onDelTags");
+                ((TextView) findViewById(R.id.textView2)).append(info);
+            }
+        }
+
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        BackgoundService.luanch(getApplicationContext());
+        registerMessageCommReceiver();
+        setContentView(R.layout.activity_main);
+        ((TextView) findViewById(R.id.textView1)).setText("推送准?。。。\n");
+        app = PushApplication.getInstance();
+        mGson = app.getGson();
+        InitLoc();
+    }
+    public void InitLoc()
+    {
+//        mLocationClient = new LocationClient(this.getApplicationContext());
+        mLocationClient = new LocationClient(getApplicationContext());
+        mMyLocationListener = new MyLocationListener();
+        mGeofenceClient = new GeofenceClient(getApplicationContext());
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        option.setOpenGps(true);// 打?gps
+        option.setCoorType("bd09ll"); // 置坐??型
+        option.setScanSpan(1000);
+        option.setProdName("BennyLoc");
+        option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
+        mLocationClient.start();
+        mLocationClient.registerLocationListener(mMyLocationListener);
+        mSearch = GeoCoder.newInstance();
+        mSearch.setOnGetGeoCodeResultListener(this);
+    }
+    private void registerMessageCommReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MessageReceiver.ACTION_COMMUNICATION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(commReceiver, intentFilter);
+    }
+//    Current Location
+    public void CurLocation(View v) {
+
+       /*CurLoc a1=new CurLoc(this);
+        LocationInfo Loc;
+        a1.InitLoc();
+      Loc=a1.Curlocation;*/
+        String S1="Latitude:"+Double.toString(Curloc1.getLatitude())+
+                  "\tLongtitude:"+Double.toString(Curloc1.getLongitude());
+        Toast.makeText(getApplicationContext(), S1,
+                Toast.LENGTH_SHORT).show();
+       /* Toast.makeText(getApplicationContext(), "Click! ",
+                Toast.LENGTH_SHORT).show();*/
+
+    }
+    public void send(View v) {
+        String userId = app.getUserId();
+        String channelId = app.getChannelId();
+        EditText etMessage = ((EditText) findViewById(R.id.etMsg));
+        curMsg = etMessage.getText().toString();
+        Message message = new Message(userId, channelId, System.currentTimeMillis(), curMsg, "");
+        SendMsgAsyncTask task = new SendMsgAsyncTask(mGson.toJson(message), userId);
+        task.setOnSendScuessListener(this);
+        task.send();
+        etMessage.setText("");
+        InputMethodManager inputmanger = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputmanger.hideSoftInputFromWindow(etMessage.getWindowToken(), 0);
+    }
+
+    //SendTag
+    public void SendTag(View v) {
+        final String userId = app.getUserId();
+        String channelId = app.getChannelId();
+        String TagStr;
+        final EditText etMessage = ((EditText) findViewById(R.id.etMsg));
+        curMsg = etMessage.getText().toString();
+        final Message message = new Message(userId, channelId, System.currentTimeMillis(), curMsg, "");
+        Log.i("SendTag", "Sendtag Start!");
+
+        //Create Alert Dialogue
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+
+        final EditText textviewGid = new EditText(this);
+        textviewGid.setHint("以英文逗?隔?：");
+        layout.addView(textviewGid);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                this);
+        builder.setView(layout);
+        builder.setPositiveButton("照TAG?送",
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+
+//                        task.setOnSendTagScuessListener(this);
+                       /* String userId = app.getUserId();
+                        SetTagTask task = new SetTagTask(textviewGid.getText().toString(), userId);
+                        task.setTags();*/
+
+                        SendTageCall(userId,message,textviewGid.getText().toString());
+                        etMessage.setText("");
+                        InputMethodManager inputmanger = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputmanger.hideSoftInputFromWindow(etMessage.getWindowToken(), 0);
+                    }
+
+                });
+        builder.show();
+        //Alert Over
+
+    }
+    public void SendTageCall(String userId,Message message,String Tagname)
+    {
+        Log.i("SendTag", "Sendtag Call");
+        SendTagMsgAsyncTask task = new SendTagMsgAsyncTask(mGson.toJson(message), userId, Tagname);
+        task.setOnSendTagScuessListener(this);
+        task.send();
+    }
+    //Original Settag
+    /*public void setTag(View v) {
+		String userId = app.getUserId();
+		SetTagTask task = new SetTagTask("TAG_GROUP", userId);
+		task.setTags();
+	}*/
+    public void setTag(View v) {
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        final EditText textviewGid = new EditText(this);
+        textviewGid.setHint("以英文逗?隔?：");
+        layout.addView(textviewGid);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                this);
+        builder.setView(layout);
+        builder.setPositiveButton("?置TAG",
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Push: ?置tag?用方式
+                      /*  List<String> tags = Utils.getTagsList(textviewGid
+                                .getText().toString());
+                        PushManager.setTags(getApplicationContext(), tags);*/
+                        String userId = app.getUserId();
+                        SetTagTask task = new SetTagTask(textviewGid.getText().toString(), userId);
+                        task.setTags();
+                    }
+
+                });
+        builder.show();
+    }
+
+    public void ListTag(View v) {
+        PushManager.listTags(this);
+    }
+
+    public void DelTag(View v) {
+        PushManager.listTags(this);
+        PushManager.delTags(this, app.getListTags());
+    }
+
+    @Override
+    public void sendScuess(String msg) {
+        Calendar calendar = Calendar.getInstance();
+        String time = calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
+        ((TextView) findViewById(R.id.textView2)).append("已送出" + time + "：" + curMsg + "\n");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(commReceiver);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(android.R.drawable.ic_dialog_info);
+        builder.setTitle("是否退出");
+        builder.setPositiveButton("完全退出",
+                new DialogInterface.OnClickListener() {
+                    @SuppressWarnings("deprecation")
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                        ActivityManager activityMgr = (ActivityManager) MainActivity.this.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityMgr.restartPackage(MainActivity.this.getPackageName());
+                        activityMgr.killBackgroundProcesses(MainActivity.this.getPackageName());
+                        System.exit(0);
+                    }
+                });
+        builder.setNegativeButton("退居后台",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        MainActivity.super.onBackPressed();
+                    }
+                });
+        builder.show();
+
+    }
+
+    /**
+     * Location Service
+     */
+    public class MyLocationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            //Receive Location
+            StringBuffer sb = new StringBuffer(256);
+            Curloc1.setLocationTime(location.getTime());
+            Curloc1.setLatitude(location.getLatitude());
+            Curloc1.setLongitude(location.getLongitude());
+            Curloc1.setLocationType(location.getLocType());
+            Curloc1.setRadius(location.getRadius());
+            Curloc1.setErrorCode(location.getLocType());
+            Toast.makeText(getApplicationContext(),  "Latitude:"+Double.toString(location.getLatitude()),
+                    Toast.LENGTH_SHORT).show();
+
+            mLocationClient.stop();
+//            Log.i("BaiduLocationApiDem", sb.toString());
+        }
+
+
+    }
+
+
+    /**
+     * 珆尨趼睫揹
+     * @param str
+     */
+    public void logMsg(String str) {
+        try {
+            if (mLocationResult != null)
+                mLocationResult=str;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onGetGeoCodeResult(GeoCodeResult result) {
+        if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+            Toast.makeText(this, "onGetGeoCodeResult抱歉", Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
+
+        String strInfo = String.format("?度：%f ?度：%f",
+                result.getLocation().latitude, result.getLocation().longitude);
+        Toast.makeText(this, strInfo, Toast.LENGTH_LONG).show();
+    }
+    @Override
+    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+        if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+            Toast.makeText(this, "Sorry! Not found!", Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
+        Toast.makeText(this, result.getAddress(),
+                Toast.LENGTH_LONG).show();
+
+    }
+    /**
+     * 詢儕僅華燴峓戲隙覃
+     * @author jpren
+     *
+     */
+}
