@@ -114,6 +114,11 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
         LocalBroadcastManager.getInstance(this).registerReceiver(commReceiver, intentFilter);
     }
 
+    //Button Event start
+    public void SetupClick(View v){
+        Intent intent=new Intent(this,SetShare.class);
+        startActivity(intent);
+    }
     public void send(View v) {
         String userId = app.getUserId();
         String channelId = app.getChannelId();

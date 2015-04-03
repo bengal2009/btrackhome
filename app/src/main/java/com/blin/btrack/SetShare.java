@@ -1,23 +1,66 @@
 package com.blin.btrack;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 
 public class SetShare extends ActionBarActivity {
-
+    private SharedPreferences settings;
+    private static final String data = "DATA";
+    private static final String UserID = "ID";
+    private static final String FirstTag = "FirstTag";
+    private static final String SecondTag = "SecondTag";
+    private TextView myid,firsttag,secondtag;
+    PushApplication app;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_share);
+        myid = (TextView) findViewById(R.id.MYID);
+        firsttag = (TextView) findViewById(R.id.TagTxt);
+        secondtag = (TextView) findViewById(R.id.SecondTag);
+        app=PushApplication.getInstance();
+        if(app!=null){
+        myid.setText(app.getUserId());
+        }
+        ReadPref();
     }
-public void SavePref(View V)
+
+//    Safe Preference
+    public void SavePref(View V)
 {
 
+    settings = getSharedPreferences(data,0);
+    settings.edit()
+            .putString(UserID, myid.getText().toString())
+            .putString(FirstTag, firsttag.getText().toString())
+            .putString(SecondTag, secondtag.getText().toString())
+            .commit();
+    finish();
 }
+    public void ReadPref(View V)
+    {
+        settings = getSharedPreferences(data,0);
+        if(settings.getString(FirstTag, "")!=null)
+            firsttag.setText(settings.getString(FirstTag, ""));
+        if(settings.getString(SecondTag, "")!=null)
+            secondtag.setText(settings.getString(SecondTag, ""));
+//        Log.i("Setshare",settings.getString(UserID, "") );
+    }
+    public void ReadPref()
+    {
+        settings = getSharedPreferences(data,0);
+        if(settings.getString(FirstTag, "")!=null)
+            firsttag.setText(settings.getString(FirstTag, ""));
+        if(settings.getString(SecondTag, "")!=null)
+            secondtag.setText(settings.getString(SecondTag, ""));
+//        Log.i("Setshare",settings.getString(UserID, "") );
+    }
    /* public void readData(){
         settings = getSharedPreferences(data,0);
         name.setText(settings.getString(nameField, ""));

@@ -240,7 +240,7 @@ public class BackgoundService extends Service {
 		mBuilder.setOngoing(true);
 		mBuilder.setStyle(newInboxStyle(userId, channelId));
 		mBuilder.addAction(0, "打开", null);
-		mBuilder.addAction(0, "??", null);
+		mBuilder.addAction(0, "关闭", null);
 		mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.huli));
 		NotificationManager mNotifyMgr =  
 		        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -277,8 +277,8 @@ public class BackgoundService extends Service {
 		registerMessageCommReceiver();
 		launchBaiduPushService();
 		registerNetworkReceiver();
-		Log.i("PushManager", "startWork");
-		notif(getApplicationContext(), "后台服务","推送后台正在绑定！...");
+//		Log.i("PushManager", "startWork");
+//		notif(getApplicationContext(), "后台服务","推送后台正在绑定！...");
 	}
 	
 	private void registerMessageCommReceiver() {
@@ -330,7 +330,7 @@ public class BackgoundService extends Service {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
 		mBuilder.setDefaults(NotificationCompat.DEFAULT_ALL);
 		mBuilder.setAutoCancel(true);
-		mBuilder.setOngoing(true);
+		mBuilder.setOngoing(false);
 		mBuilder.setTicker(ticker);
 		mBuilder.setSmallIcon(R.drawable.ic_launcher);
 		mBuilder.setContentTitle("后台服务");
