@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 
 public class SendMsgAsyncTask {
 	private BaiduPush mBaiduPush;
@@ -55,6 +57,16 @@ public class SendMsgAsyncTask {
 		@Override
 		protected String doInBackground(Void... message) {
 			String result = "";
+            try {
+                JSONObject obj = new JSONObject(mMessage);
+                String[] S1= obj.getString("message").split(",");
+//                Log.i("SendMSGAsyncBenny", S1[0]);
+//                Log.i("SendMSGAsyncBenny", mMessage);
+            }
+            catch (Exception E)
+            {
+                Log.i("SendMSGAsyncBenny",E.toString());
+            }
 
 				result = mBaiduPush.PushMessage(mMessage);
 
