@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
 public class SetShare extends ActionBarActivity {
@@ -13,8 +14,24 @@ public class SetShare extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_share);
     }
+public void SavePref(View V)
+{
 
-
+}
+   /* public void readData(){
+        settings = getSharedPreferences(data,0);
+        name.setText(settings.getString(nameField, ""));
+        phone.setText(settings.getString(phoneField, ""));
+        sex.setText(settings.getString(sexField, ""));
+    }
+    public void saveData(){
+        settings = getSharedPreferences(data,0);
+        settings.edit()
+                .putString(nameField, name.getText().toString())
+                .putString(phoneField, phone.getText().toString())
+                .putString(sexField, sex.getText().toString())
+                .commit();
+    }*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

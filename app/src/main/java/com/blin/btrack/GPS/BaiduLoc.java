@@ -47,7 +47,7 @@ public class BaiduLoc extends ActionBarActivity implements OnGetGeoCoderResultLi
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_baidu_loc);
-        LocationResult = (TextView)findViewById(R.id.textView1);
+        LocationResult = (TextView)findViewById(R.id.View1);
         mLocationClient = new LocationClient(this.getApplicationContext());
         mMyLocationListener = new MyLocationListener();
 //        mLocationClient.registerLocationListener(mMyLocationListener);

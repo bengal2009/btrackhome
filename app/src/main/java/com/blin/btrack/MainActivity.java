@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
                     Toast.makeText(getApplicationContext(), "推送服务失败：" + errorCode,
                             Toast.LENGTH_LONG).show();
                 }
-                ((TextView) findViewById(R.id.textView1)).append(bindString);
+                ((TextView) findViewById(R.id.View1)).append(bindString);
 
             } else if (intent.hasExtra("onMessage")) {
                 String msgLine = "";
@@ -102,7 +102,7 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
         BackgoundService.luanch(getApplicationContext());
         registerMessageCommReceiver();
         setContentView(R.layout.activity_main);
-        ((TextView) findViewById(R.id.textView1)).setText("推送准备。。。\n");
+        ((TextView) findViewById(R.id.View1)).setText("推送准备。。。\n");
         app = PushApplication.getInstance();
         mGson = app.getGson();
         CurLocShow.setOnCurSendScuessListener(this);

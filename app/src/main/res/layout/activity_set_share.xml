@@ -13,22 +13,23 @@
         >
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:text="ID:"
             android:id="@+id/textView"
             android:textSize="@dimen/SetIDSize"
-            android:layout_weight="0.20"
-            style="@style/Base.TextAppearance.AppCompat.Button" />
+            android:layout_weight="0.15"
+            style="@style/Base.TextAppearance.AppCompat.Button"
+            android:gravity="right" />
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/InputWidth"
             android:layout_height="wrap_content"
             android:id="@+id/MYID"
             android:hint="Input ID"
             android:textSize="@dimen/SetIDSize"
             android:layout_weight="0.85"
-             />
+            android:paddingLeft="15dp" />
 
     </LinearLayout>
     <LinearLayout
@@ -38,24 +39,70 @@
         android:layout_marginTop="80dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:text="Tag:"
-            android:id="@+id/textView1"
+            android:id="@+id/View1"
             android:textSize="@dimen/SetIDSize"
             android:layout_weight="0.15"
+
+
             style="@style/Base.TextAppearance.AppCompat.Button"
-             />
+            android:gravity="right" />
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/InputWidth"
             android:layout_height="wrap_content"
             android:id="@+id/TagTxt"
             android:hint="Input Tag"
             android:textSize="@dimen/SetIDSize"
 
             android:layout_weight="0.85"
-         />
+            android:paddingLeft="15dp" />
 
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="160dp">
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="2Tag:"
+            android:id="@+id/View12"
+            android:textSize="@dimen/SetIDSize"
+            android:layout_weight="0.15"
+
+
+            style="@style/Base.TextAppearance.AppCompat.Button"
+            android:gravity="right" />
+
+        <EditText
+            android:layout_width="@dimen/InputWidth"
+            android:layout_height="wrap_content"
+            android:id="@+id/SecondTag"
+            android:hint="Input Tag"
+            android:textSize="@dimen/SetIDSize"
+
+            android:layout_weight="0.85"
+            android:paddingLeft="15dp" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="240dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:id="@+id/button3"
+            android:onClick="SavePref"
+            android:layout_gravity="center_horizontal" />
     </LinearLayout>
 </RelativeLayout>

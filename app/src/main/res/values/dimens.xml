@@ -4,5 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="shmsg_textsize">20sp</dimen>
     <dimen name="tv1_size">20sp</dimen>
-    <dimen name="SetIDSize">30sp</dimen>
+    <dimen name="SetIDSize">20sp</dimen>
+    <dimen name="InputWidth">80dp</dimen>
 </resources>
