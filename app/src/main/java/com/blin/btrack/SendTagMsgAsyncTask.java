@@ -57,7 +57,6 @@ public class SendTagMsgAsyncTask {
 		@Override
 		protected String doInBackground(Void... message) {
 			String result = "";
-//				result = mBaiduPush.PushMessage(mMessage);
 				result = mBaiduPush.PushTagMessage(mMessage,mTagStr);
 
 			return result;

@@ -57,9 +57,11 @@ public class SendMsgAsyncTask {
 		@Override
 		protected String doInBackground(Void... message) {
 			String result = "";
+            String[] S1=null;
+            //Sample RQLOCT,benny,eva
             try {
                 JSONObject obj = new JSONObject(mMessage);
-                String[] S1= obj.getString("message").split(",");
+                S1= obj.getString("message").split(",");
 //                Log.i("SendMSGAsyncBenny", S1[0]);
 //                Log.i("SendMSGAsyncBenny", mMessage);
             }
@@ -67,8 +69,13 @@ public class SendMsgAsyncTask {
             {
                 Log.i("SendMSGAsyncBenny",E.toString());
             }
-
-				result = mBaiduPush.PushMessage(mMessage);
+            if(S1[0].equals("RQLOCT"))
+            {
+                result = mBaiduPush.PushTagMessage(mMessage,S1[2]);
+                Log.i("SendMSGAsyncBenny", S1[2]);
+            }else {
+                result = mBaiduPush.PushMessage(mMessage);
+            }
 
 			return result;
 		}

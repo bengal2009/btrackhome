@@ -22,6 +22,8 @@ import android.util.Log;
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
 import com.baidu.android.pushservice.PushSettings;
+import com.blin.btrack.GPS.CurLoc;
+import com.blin.btrack.GPS.LocationInfo;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -34,7 +36,9 @@ import java.sql.Timestamp;
  * @author: Bvin
  * @date: 2015年2月27日 上午11:46:58
  */
-public class BackgoundService extends Service {
+public class BackgoundService extends Service implements
+        SendTagMsgAsyncTask.OnSendTagScuessListener
+        ,CurLoc.OnCurSendScuessListener{
 	
 	private static final int BACK_GROUND_NOTIFICATION_ID = 1610;
 	
@@ -45,13 +49,16 @@ public class BackgoundService extends Service {
 	private boolean isBaiduPushStarted;
 	private String userId;
 	private String channelId;
-	private String userNumber;
+	private String userNumber,TargetTag;
 
-
+    Context mcontext;
+    Gson mGson=PushApplication.getInstance().getGson();
+    CurLoc CurLocShow=new CurLoc(this);
     BroadcastReceiver commReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+            mcontext=context;
 			if (intent.hasExtra("onBind")) {
 				Bundle bindData = intent.getBundleExtra("onBind");
 				int errorCode =  bindData.getInt("errorCode");
@@ -73,8 +80,10 @@ public class BackgoundService extends Service {
 				
 			}else if (intent.hasExtra("onMessage")) {
 				String msgLine = "";
+
 				try {
 					Message msg = (Message) intent.getSerializableExtra("onMessage");
+                    FilterMSG(msg.getMessage());
 					String userNumber = "(No."+msg.getUser_id().substring(msg.getUser_id().length()-4)+")";
 					Timestamp tt = new Timestamp(msg.getTime_samp());
 					msgLine = "收到消息"+tt.getHours()+":"+tt.getMinutes()
@@ -111,7 +120,75 @@ public class BackgoundService extends Service {
 	};
 
 	private int i;
-	
+
+    //Fiter Message
+private void FilterMSG(String MSG)
+{
+    String[] S1=null;
+    String tagname=null;
+    String result = "";
+    BaiduPush mBaiduPush;
+    PushApplication app=PushApplication.getInstance();
+
+    mBaiduPush =app.getBaiduPush();
+
+    S1= MSG.split(",");
+    if(S1[0].equals("RQLOCT")) {
+        TargetTag=S1[1];
+        if(CurLocShow.GetLocaFlag==false)
+        {
+
+            CurLocShow.InitLoc();
+        }
+        else{
+            Log.i("MainActivity","Location Start!");
+            CurLocShow.mLocationClient.start();
+        }
+
+
+        /*StringBuilder sb=new StringBuilder();
+        sb.append("CURLOC,");
+        sb.append(app.getUserId()+",");
+        sb.append(Double.toString(CurrentLoc.getLatitude())+",");
+        sb.append(Double.toString(CurrentLoc.getLongitude()));
+        tagname=S1[1];
+        Message message1 = new Message(app.getUserId(), app.getChannelId(), System.currentTimeMillis(), "hello", tagname);
+
+        SendTagMsgAsyncTask task = new SendTagMsgAsyncTask(mGson.toJson(message1), app.getUserId(), tagname);
+        task.setOnSendTagScuessListener(this);
+        task.send();*/
+
+       /* Toast.makeText(getApplicationContext(), "Got Location Request ",
+                Toast.LENGTH_SHORT).show();*/
+
+    }
+}
+
+    //Display Location String
+    @Override
+    public void CurLocsendScuess(LocationInfo CurrentLoc)
+    {
+        PushApplication app=PushApplication.getInstance();
+        Log.i("getLatitude", Double.toString(CurrentLoc.getLatitude()));
+        StringBuilder sb=new StringBuilder();;
+        sb.append("CULOC,");
+        sb.append(TargetTag+",");
+        sb.append(Double.toString(CurrentLoc.getLatitude())+",");
+        sb.append(Double.toString(CurrentLoc.getLongitude()));
+        if (!TargetTag.isEmpty()) {
+            Message message1 = new Message(app.getUserId(), app.getChannelId(), System.currentTimeMillis(), sb.toString(), TargetTag);
+            SendTagMsgAsyncTask task = new SendTagMsgAsyncTask(mGson.toJson(message1), app.getUserId(), TargetTag);
+            task.setOnSendTagScuessListener(this);
+            task.send();
+        }
+
+    }
+    //Send Query Success
+
+    @Override
+    public void sendScuess(String msg) {
+Log.i("BGSVC","SendScuess");
+    }
 
 	private void createShortcut(Context context,String name,String url,Bitmap bitmap) {  
         Intent shortcut = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");  
@@ -277,6 +354,7 @@ public class BackgoundService extends Service {
 		registerMessageCommReceiver();
 		launchBaiduPushService();
 		registerNetworkReceiver();
+        CurLocShow.setOnCurSendScuessListener(this);
 //		Log.i("PushManager", "startWork");
 //		notif(getApplicationContext(), "后台服务","推送后台正在绑定！...");
 	}

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -35,8 +36,13 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
     Gson mGson;
     String curMsg;
     CurLoc CurLocShow=new CurLoc(this);
-
     LocationInfo LocInfo=new LocationInfo();
+    //Preference Declare
+    private SharedPreferences settings;
+    private  String data = "DATA";
+    private  String UserID = "ID";
+    private  String FirstTag = "FirstTag";
+    private  String SecondTag = "SecondTag";
     BroadcastReceiver commReceiver = new BroadcastReceiver() {
 
         @Override
@@ -105,9 +111,21 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
         ((TextView) findViewById(R.id.View1)).setText("推送准备。。。\n");
         app = PushApplication.getInstance();
         mGson = app.getGson();
+        ReadPref();
         CurLocShow.setOnCurSendScuessListener(this);
     }
 
+    private void ReadPref()
+    {
+        settings = getSharedPreferences(data,0);
+        if(settings.getString(FirstTag, "")!=null)
+            FirstTag=settings.getString(FirstTag, "");
+        if(settings.getString(SecondTag, "")!=null)
+            SecondTag=settings.getString(SecondTag, "");
+
+
+//        Log.i("Setshare",settings.getString(UserID, "") );
+    }
     private void registerMessageCommReceiver() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MessageReceiver.ACTION_COMMUNICATION);
@@ -115,6 +133,16 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
     }
 
     //Button Event start
+//    QueryClick
+    public void QueryClick(View v){
+        StringBuilder sb=new StringBuilder();;
+        sb.append("RQLOCT,");
+        sb.append(FirstTag+",");//My Tag
+        sb.append(SecondTag);//My Tag
+
+        final EditText etMessage = ((EditText) findViewById(R.id.etMsg));
+        etMessage.setText(sb.toString());
+    }
     public void SetupClick(View v){
         Intent intent=new Intent(this,SetShare.class);
         startActivity(intent);
@@ -134,8 +162,7 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
     }
     //Current Location
     public void CurLocation(View v){
-        Toast.makeText(getApplicationContext(), "Click! ",
-                Toast.LENGTH_SHORT).show();
+
        CurLoc a1=new CurLoc(this);
         a1.InitLoc();
        /* LocInfo=a1.ReturnLocInfo();
@@ -150,7 +177,6 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
         final EditText etMessage = ((EditText) findViewById(R.id.etMsg));
         curMsg = etMessage.getText().toString();
         final Message message = new Message(userId, channelId, System.currentTimeMillis(), curMsg, "");
-        Log.i("SendTag", "Sendtag Start!");
 
         //Create Alert Dialogue
         LinearLayout layout = new LinearLayout(this);

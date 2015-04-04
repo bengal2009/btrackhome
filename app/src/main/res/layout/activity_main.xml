@@ -126,6 +126,16 @@
         android:onClick="SetupClick"
         android:text="设定"
         android:layout_below="@+id/button"
+        android:layout_toLeftOf="@+id/button8"
+        android:layout_toStartOf="@+id/button8" />
+
+    <Button
+        android:id="@+id/button8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="QueryClick"
+        android:text="询问"
+        android:layout_below="@+id/button"
         android:layout_toLeftOf="@+id/button5"
         android:layout_toStartOf="@+id/button5" />
 
