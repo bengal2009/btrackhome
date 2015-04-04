@@ -1,16 +1,23 @@
 package com.blin.btrack;
 
+import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -152,6 +159,10 @@ public class MapAct extends ActionBarActivity implements
 
         Double latitude = Double.parseDouble(bundle.getString("latitude"));
         Double longtidude = Double.parseDouble(bundle.getString("longtidude"));
+
+         /* notif(this,"目前位置","Latitude:"+bundle.getString("latitude")+
+                  ",Longtitude"+bundle.getString("longtidude"));*/
+
         Log.i(TAGSTR,"Latitude:"+bundle.getString("latitude"));
           ClientPOI=new LatLng(latitude,longtidude);
           /*MapStatusUpdate u4 = MapStatusUpdateFactory
@@ -262,9 +273,47 @@ public class MapAct extends ActionBarActivity implements
             return true;
         } else if( id == R.id.back_map) {
             BackMap();
+        } else if( id == R.id.check_map) {
+            checkmap();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+private void checkmap()
+{
+    //Create Alert Dialogue
+    LinearLayout layout = new LinearLayout(this);
+    layout.setOrientation(LinearLayout.VERTICAL);
+
+
+    final EditText textviewGid = new EditText(this);
+    textviewGid.setHint("以英文逗号隔开：");
+    layout.addView(textviewGid);
+    textviewGid.setText(SecondTag.toString());
+    AlertDialog.Builder builder = new AlertDialog.Builder(
+            this);
+    builder.setView(layout);
+    builder.setPositiveButton("发送",
+            new DialogInterface.OnClickListener() {
+
+                public void onClick(DialogInterface dialog, int which) {
+                    SendTageCall();
+                }
+
+            });
+    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+        }
+    });
+    builder.show();
+}
+    public void SendTageCall(String userId,Message message,String Tagname)
+    {
+        SendTagMsgAsyncTask task = new SendTagMsgAsyncTask(mGson.toJson(message), userId, Tagname);
+        task.setOnSendTagScuessListener(this);
+        task.send();
     }
 private void BackMap()
 {
@@ -377,5 +426,34 @@ private void BackMap()
 
         public void onReceivePoi(BDLocation poiLocation) {
         }
+    }
+    private void notif(Context context,String title, String msg) {
+       /* NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+        mBuilder.setDefaults(NotificationCompat.DEFAULT_ALL);
+        mBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        mBuilder.setTicker("您有新的消息哦！");
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+        mBuilder.setContentTitle("消息");
+
+            mBuilder.setContentText(msg);
+        NotificationManager mNotifyMgr =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(1, mBuilder.build());
+        //Toast.makeText(arg0, msg.getMessage(), Toast.LENGTH_SHORT).show();*/
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(title)
+                        .setContentText(msg);
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(1, builder.build());
     }
 }

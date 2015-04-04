@@ -5,4 +5,6 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/back_map" android:title="回到现在"
         android:orderInCategory="90" app:showAsAction="never" />
+    <item android:id="@+id/check_map" android:title="询问地址"
+        android:orderInCategory="90" app:showAsAction="never" />
 </menu>
