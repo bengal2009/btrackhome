@@ -83,9 +83,9 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
                 Log.i("onReceive", info);
                 ((TextView) findViewById(R.id.textView2)).append(info);
             } else if (intent.hasExtra("onListTags")) {
-               /* String info = intent.getStringExtra("onListTags");
-                ((TextView)findViewById(R.id.textView2)).append(info);*/
+
                 Bundle bindData = intent.getBundleExtra("onListTags");
+                if(bindData==null) return;
                 ArrayList<String> tagstr = bindData.getStringArrayList("tags");
                 app.setListTags(tagstr);
                 for (String s1 : tagstr) {

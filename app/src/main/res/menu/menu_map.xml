@@ -3,4 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context="com.blin.btrack.MapAct">
     <item android:id="@+id/action_settings" android:title="设定"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/back_map" android:title="回到现在"
+        android:orderInCategory="90" app:showAsAction="never" />
 </menu>

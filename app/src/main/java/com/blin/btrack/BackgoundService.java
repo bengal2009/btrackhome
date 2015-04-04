@@ -146,25 +146,17 @@ private void FilterMSG(String MSG)
         }
 
 
-        /*StringBuilder sb=new StringBuilder();
-        sb.append("CURLOC,");
-        sb.append(app.getUserId()+",");
-        sb.append(Double.toString(CurrentLoc.getLatitude())+",");
-        sb.append(Double.toString(CurrentLoc.getLongitude()));
-        tagname=S1[1];
-        Message message1 = new Message(app.getUserId(), app.getChannelId(), System.currentTimeMillis(), "hello", tagname);
 
-        SendTagMsgAsyncTask task = new SendTagMsgAsyncTask(mGson.toJson(message1), app.getUserId(), tagname);
-        task.setOnSendTagScuessListener(this);
-        task.send();*/
-
-       /* Toast.makeText(getApplicationContext(), "Got Location Request ",
-                Toast.LENGTH_SHORT).show();*/
 
     }else if(S1[0].equals("CULOC"))
     {
         Log.i("BGSVC","CULOC");
         Intent intent = new Intent(this, MapAct.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("latitude",S1[2] );
+        bundle.putString("longtidude",S1[3]);
+        intent.putExtras(bundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
     }
