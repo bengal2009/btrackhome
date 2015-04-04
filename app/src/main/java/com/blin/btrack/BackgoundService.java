@@ -161,6 +161,12 @@ private void FilterMSG(String MSG)
        /* Toast.makeText(getApplicationContext(), "Got Location Request ",
                 Toast.LENGTH_SHORT).show();*/
 
+    }else if(S1[0].equals("CULOC"))
+    {
+        Log.i("BGSVC","CULOC");
+        Intent intent = new Intent(this, MapAct.class);
+        startActivity(intent);
+
     }
 }
 
