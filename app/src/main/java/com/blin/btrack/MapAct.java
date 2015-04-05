@@ -148,6 +148,7 @@ public class MapAct extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         mcontext = getApplicationContext();
+        app = PushApplication.getInstance();
       Bundle bundle =this.getIntent().getExtras();
         if(bundle!=null) {
             isBundle=!isBundle;}
@@ -296,8 +297,15 @@ private void checkmap()
     builder.setPositiveButton("发送",
             new DialogInterface.OnClickListener() {
 
+
                 public void onClick(DialogInterface dialog, int which) {
-                    SendTageCall();
+                    String cuMsg="RQLOCT,"+FirstTag+","+SecondTag;
+                    String UserID,CNLID=null;
+                    UserID=app.getUserId();
+                    CNLID=app.getChannelId();
+
+                    Message message1 = new Message(UserID, CNLID, System.currentTimeMillis(), cuMsg,textviewGid.getText().toString());
+                    MapSendTageCall(UserID,message1,textviewGid.getText().toString());
                 }
 
             });
@@ -309,7 +317,7 @@ private void checkmap()
     });
     builder.show();
 }
-    public void SendTageCall(String userId,Message message,String Tagname)
+    public void MapSendTageCall(String userId,Message message,String Tagname)
     {
         SendTagMsgAsyncTask task = new SendTagMsgAsyncTask(mGson.toJson(message), userId, Tagname);
         task.setOnSendTagScuessListener(this);
