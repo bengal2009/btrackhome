@@ -75,7 +75,7 @@ public class BackgoundService extends Service implements
 //                    綁定成功通知
 //					issueNotificationWithBind(context, userId, channelId);
 				}else {
-					issueNotificationWithBindFaild(errorCode);
+//					issueNotificationWithBindFaild(errorCode);
 				}
 				
 			}else if (intent.hasExtra("onMessage")) {
@@ -153,6 +153,7 @@ private void FilterMSG(String MSG)
         Log.i("BGSVC","CULOC");
         Intent intent = new Intent(this, MapAct.class);
         Bundle bundle = new Bundle();
+//        bundle.putString("sendertag",S1[1] );
         bundle.putString("latitude",S1[2] );
         bundle.putString("longtidude",S1[3]);
         intent.putExtras(bundle);
@@ -286,10 +287,10 @@ Log.i("BGSVC","SendScuess");
 	private void issueNotificationWithBindFaild(int errorCode) {
 		//icon、title、text三要素不可缺少？
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-		.setTicker("推送服??定失?")
+		.setTicker("推送服务失败")
 		.setSmallIcon(R.drawable.ic_launcher)
 		.setContentTitle("后台服务")
-		.setContentText("???"+errorCode);
+		.setContentText("代码："+errorCode);
 		Intent intent = new Intent(this, BackgoundService.class);
 		intent.putExtra("rebound", true);
 		mBuilder.addAction(0, "重发", PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));

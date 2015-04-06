@@ -43,6 +43,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.blin.btrack.GPS.CurLoc;
 import com.blin.btrack.GPS.LocationInfo;
+import com.blin.btrack.GPS.OfflineDemo;
 import com.google.gson.Gson;
 
 import java.sql.Timestamp;
@@ -76,7 +77,7 @@ public class MapAct extends ActionBarActivity implements
            */
     PushApplication app;
     Gson mGson;
-    String curMsg;
+    String curMsg,CurTag;
     CurLoc CurLocShow=new CurLoc(this);
     LocationInfo LocInfo=new LocationInfo();
     //Preference Declare
@@ -151,7 +152,7 @@ public class MapAct extends ActionBarActivity implements
         app = PushApplication.getInstance();
       Bundle bundle =this.getIntent().getExtras();
         if(bundle!=null) {
-            isBundle=!isBundle;}
+            isBundle=true;}
         InitMap();
         InitPush();
         BitmapDescriptor bdA = BitmapDescriptorFactory
@@ -160,7 +161,7 @@ public class MapAct extends ActionBarActivity implements
 
         Double latitude = Double.parseDouble(bundle.getString("latitude"));
         Double longtidude = Double.parseDouble(bundle.getString("longtidude"));
-
+        CurTag=bundle.getString("sendertag");
          /* notif(this,"目前位置","Latitude:"+bundle.getString("latitude")+
                   ",Longtitude"+bundle.getString("longtidude"));*/
 
@@ -228,8 +229,10 @@ public class MapAct extends ActionBarActivity implements
     }
     private void ReadPref() {
         settings = getSharedPreferences(data, 0);
-        if (settings.getString(FirstTag, "") != null)
+        if (settings.getString(FirstTag, "") != null) {
             FirstTag = settings.getString(FirstTag, "");
+            CurTag=FirstTag;
+        }
         if (settings.getString(SecondTag, "") != null)
             SecondTag = settings.getString(SecondTag, "");
     }
@@ -276,6 +279,9 @@ public class MapAct extends ActionBarActivity implements
             BackMap();
         } else if( id == R.id.check_map) {
             checkmap();
+        }else if( id == R.id.offlinemap) {
+            Intent intent = new Intent(this, OfflineDemo.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -299,13 +305,26 @@ private void checkmap()
 
 
                 public void onClick(DialogInterface dialog, int which) {
-                    String cuMsg="RQLOCT,"+FirstTag+","+SecondTag;
+//                    String cuMsg="RQLOCT,"+FirstTag+","+textviewGid.getText().toString();
+//                    Log.i(TAGSTR,textviewGid.getText().toString());
+                    try
+                    {
+                    if(textviewGid.getText().toString()=="") return;
+                    String Tempstr=textviewGid.getText().toString();
+
+                    String Msg1="RQLOCT,"+FirstTag+","+Tempstr;
+                    Log.i(TAGSTR,Msg1);
                     String UserID,CNLID=null;
                     UserID=app.getUserId();
                     CNLID=app.getChannelId();
-
-                    Message message1 = new Message(UserID, CNLID, System.currentTimeMillis(), cuMsg,textviewGid.getText().toString());
-                    MapSendTageCall(UserID,message1,textviewGid.getText().toString());
+                    CurTag=textviewGid.getText().toString();
+                    Message message1 = new Message(UserID, CNLID, System.currentTimeMillis(), Msg1,Tempstr);
+                    MapSendTageCall(UserID,message1,Tempstr);
+                        }
+                    catch(Exception E)
+                    {
+                        Log.i(TAGSTR,"Stop:"+textviewGid.getText().toString());
+                    }
                 }
 
             });
@@ -383,6 +402,7 @@ private void BackMap()
         if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
             Toast.makeText(this, "Sorry! Not found!", Toast.LENGTH_LONG)
                     .show();
+
             return;
         }
         /*
@@ -392,8 +412,10 @@ private void BackMap()
                         .fromResource(R.drawable.icon_marka)));
         mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(result
                 .getLocation()));*/
+        Log.i(TAGSTR,"onGetReverseGeoCodeResult");
         Toast.makeText(this, result.getAddress(),
                 Toast.LENGTH_LONG).show();
+        setTitle(FirstTag+":"+result.getAddress());
 
     }
 
@@ -419,20 +441,23 @@ private void BackMap()
             mBaiduMap.setMyLocationData(locData);
             if (isFirstLoc) {
                 isFirstLoc = false;
-                LatLng ll = new LatLng(location.getLatitude(),
+               /* LatLng ll = new LatLng(location.getLatitude(),
                         location.getLongitude());
-                /*Log.i(TAG,"Latitude:"+Double.toString(location.getLatitude()));
-                Log.i(TAG,"Longitude:"+Double.toString(location.getLongitude()));*/
-
 
                 MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ll);
                 mBaiduMap.animateMapStatus(u);
                 mLocClient.stop();
-                Log.i(TAGSTR,"mloclient Stop!");
+                Log.i(TAGSTR,"mloclient Stop!");*/
             }
-        }
+            LatLng ll = new LatLng(location.getLatitude(),
+                    location.getLongitude());
 
-        public void onReceivePoi(BDLocation poiLocation) {
+            MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ll);
+            mBaiduMap.animateMapStatus(u);
+            mLocClient.stop();
+            mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                    .location(CurPOI));
+            Log.i(TAGSTR,"mloclient Stop!");
         }
     }
     private void notif(Context context,String title, String msg) {
