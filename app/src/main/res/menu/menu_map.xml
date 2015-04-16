@@ -9,4 +9,6 @@
         android:orderInCategory="80" app:showAsAction="never" />
     <item android:id="@+id/offlinemap" android:title="离线地图"
         android:orderInCategory="85" app:showAsAction="never" />
+    <item android:id="@+id/checkupdate" android:title="检查更新"
+        android:orderInCategory="83" app:showAsAction="never" />
 </menu>

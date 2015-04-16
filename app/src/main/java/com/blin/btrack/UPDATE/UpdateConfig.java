@@ -23,7 +23,7 @@ public class UpdateConfig {
         int verCode = -1;
         try {
             verCode = context.getPackageManager().getPackageInfo(
-                    "com.example.blin.updatesample", 0).versionCode;
+                    "com.blin.btrack", 0).versionCode;
         } catch (NameNotFoundException e) {
             Log.e(TAG, e.getMessage());
         }

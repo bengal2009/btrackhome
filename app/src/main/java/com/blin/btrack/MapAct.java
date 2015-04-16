@@ -44,6 +44,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.blin.btrack.GPS.CurLoc;
 import com.blin.btrack.GPS.LocationInfo;
 import com.blin.btrack.GPS.OfflineDemo;
+import com.blin.btrack.UPDATE.ChkUpdate;
 import com.google.gson.Gson;
 
 import java.sql.Timestamp;
@@ -292,7 +293,11 @@ public class MapAct extends ActionBarActivity implements
         } else if (id == R.id.offlinemap) {
             Intent intent = new Intent(this, OfflineDemo.class);
             startActivity(intent);
+        }else if (id == R.id.checkupdate) {
+            ChkUpdate A1=new ChkUpdate();
+            A1.StartCheck();
         }
+
 
         return super.onOptionsItemSelected(item);
     }

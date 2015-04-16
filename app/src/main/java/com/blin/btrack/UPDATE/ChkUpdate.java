@@ -8,15 +8,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
-
-import com.blin.btrack.R;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -36,19 +34,21 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
     private static final String TAG = "Update";
     public ProgressDialog pBar;
     private Handler handler = new Handler();
-
+    private Context mcontext;
     private int newVerCode = 0;
     private String newVerName = "";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    /*
+         *StartCheck
+         * StartCheck
+         * @return int
+           */
+    public void StartCheck()
+    {
         ReadJsonAsync task=new ReadJsonAsync();
         task.setOnRetriveScuessListener(this);
         task.ReadJson(UpdateConfig.UPDATE_SERVER
                 + UpdateConfig.UPDATE_VERJSON);
-
 
     }
     @Override
