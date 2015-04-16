@@ -88,9 +88,9 @@ public class BackgoundService extends Service implements
 					Timestamp tt = new Timestamp(msg.getTime_samp());
 					msgLine = "收到消息"+tt.getHours()+":"+tt.getMinutes()
 							+"："+userNumber+msg.getMessage()+"\n";
-					Log.i("onReceive", msgLine);
+//					Log.i("onReceive", msgLine);
 				} catch (Exception e) {
-					Log.i("onReceive", msgLine);
+//					Log.i("onReceive", msgLine);
 					msgLine = "收到消息"+intent.getStringExtra("onMessage")+"\n";
 					ShortcutMeta shortcut = new Gson().fromJson(intent.getStringExtra("onMessage"), ShortcutMeta.class);
 					new CreateNetIconShortcutTask().execute(shortcut);
@@ -107,7 +107,7 @@ public class BackgoundService extends Service implements
 			boolean noNetworkAvailable = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 			Log.i("网路", noNetworkAvailable ? "没有网" : "有网");
 			if (noNetworkAvailable) {//离?
-				issueNotificationWithNoConnective();
+//				issueNotificationWithNoConnective();
 			}else if (!isBaiduPushStarted) {//尚未??推?并且有网了
 				if (!isBaiduPushStarting) {//正在??
 					launchBaiduPushService();//再?定一次
@@ -141,7 +141,7 @@ private void FilterMSG(String MSG)
             CurLocShow.InitLoc();
         }
         else{
-            Log.i("MainActivity","Location Start!");
+//            Log.i("MainActivity","Location Start!");
             CurLocShow.mLocationClient.start();
         }
 
@@ -150,7 +150,7 @@ private void FilterMSG(String MSG)
 
     }else if(S1[0].equals("CULOC"))
     {
-        Log.i("BGSVC","CULOC");
+//        Log.i("BGSVC","CULOC");
         Intent intent = new Intent(this, MapAct.class);
         Bundle bundle = new Bundle();
 //        bundle.putString("sendertag",S1[1] );
@@ -168,7 +168,7 @@ private void FilterMSG(String MSG)
     public void CurLocsendScuess(LocationInfo CurrentLoc)
     {
         PushApplication app=PushApplication.getInstance();
-        Log.i("getLatitude", Double.toString(CurrentLoc.getLatitude()));
+//        Log.i("getLatitude", Double.toString(CurrentLoc.getLatitude()));
         StringBuilder sb=new StringBuilder();;
         sb.append("CULOC,");
         sb.append(TargetTag+",");
@@ -233,7 +233,7 @@ Log.i("BGSVC","SendScuess");
 		protected void onPostExecute(Bitmap result) {
 			super.onPostExecute(result);
 			if (result!=null) {
-				Log.i("onPostExecute", result.getWidth() + "");
+//				Log.i("onPostExecute", result.getWidth() + "");
 				if (shortcut.sendAsNotification) {
 					notifMessage(getApplicationContext(),  shortcut.name, shortcut.openUrl, result);
 				}
@@ -349,7 +349,7 @@ Log.i("BGSVC","SendScuess");
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.i("BackgoundService", "onCreate");
+//		Log.i("BackgoundService", "onCreate");
 		registerMessageCommReceiver();
 		launchBaiduPushService();
 		registerNetworkReceiver();
@@ -381,7 +381,7 @@ Log.i("BGSVC","SendScuess");
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		//notif(getApplicationContext(), "?始?行","后台服?正在?行");
-		Log.i("BackgoundService", "onStartCommand" + startId);
+//		Log.i("BackgoundService", "onStartCommand" + startId);
 		if(intent!=null&&intent.hasExtra("rebound")) {
 			if (intent.getBooleanExtra("rebound", false)) {
 				launchBaiduPushService();//重新?定
@@ -393,7 +393,7 @@ Log.i("BGSVC","SendScuess");
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.i("BackgoundService", "onDestroy");
+//		Log.i("BackgoundService", "onDestroy");
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(commReceiver);
 		unregisterReceiver(networkReceiver);
 		notif(getApplicationContext(), "后台服务结束","后台服务已停止");

@@ -97,7 +97,7 @@ public class CurLoc extends Activity {
                 mListener.CurLocsendScuess(a2);
 
                 mLocationClient.stop();
-                Log.i("mLocationClient", "Stop!");
+//                Log.i("mLocationClient", "Stop!");
             }
             catch (Exception E)
             {

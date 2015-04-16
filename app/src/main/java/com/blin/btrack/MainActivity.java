@@ -124,7 +124,6 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
             SecondTag=settings.getString(SecondTag, "");
 
 
-//        Log.i("Setshare",settings.getString(UserID, "") );
     }
     private void registerMessageCommReceiver() {
         IntentFilter intentFilter = new IntentFilter();
@@ -288,7 +287,6 @@ public class MainActivity extends Activity implements SendMsgAsyncTask.OnSendScu
         CurLocShow.InitLoc();
     }
         else{
-           Log.i("MainActivity","Location Start!");
         CurLocShow.mLocationClient.start();
     }
 

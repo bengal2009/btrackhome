@@ -54,38 +54,10 @@ public class MapAct extends ActionBarActivity implements
         OnGetGeoCoderResultListener,
         SendMsgAsyncTask.OnSendScuessListener,
         SendTagMsgAsyncTask.OnSendTagScuessListener,
-        CurLoc.OnCurSendScuessListener{
+        CurLoc.OnCurSendScuessListener {
     private static final LatLng GEO_BEIJING = new LatLng(39.945, 116.404);
     public MyLocationListenner myListener = new MyLocationListenner();
     String TAGSTR = "LocationDemo";
-    // 定位相
-    LocationClient mLocClient;
-    BitmapDescriptor mCurrentMarker;
-    GeoCoder mSearch = null; // 搜索模?，也可去掉地?模??立使用
-    BaiduMap mBaiduMap = null;
-    MapView mMapView = null;
-    boolean isFirstLoc = true;// 是否首次定位
-    boolean isBundle = false;// 是否首次定位
-    private LocationClientOption.LocationMode mCurrentMode;
-    private Context mcontext;
-    private LatLng CurPOI,ClientPOI;
-    private Marker mMarkerA;
-    /*
-         * Push Relate
-         * #Push Relate
-         * @return int
-           */
-    PushApplication app;
-    Gson mGson;
-    String curMsg,CurTag;
-    CurLoc CurLocShow=new CurLoc(this);
-    LocationInfo LocInfo=new LocationInfo();
-    //Preference Declare
-    private SharedPreferences settings;
-    private  String data = "DATA";
-    private  String UserID = "ID";
-    private  String FirstTag = "FirstTag";
-    private  String SecondTag = "SecondTag";
     //Push Over
     BroadcastReceiver commMapReceiver = new BroadcastReceiver() {
 
@@ -97,7 +69,7 @@ public class MapAct extends ActionBarActivity implements
                 String bindString;
                 if (errorCode == 0) {
                     bindString = " 用户Id: " + bindData.getString("userId") + "\n 通道Id: " + bindData.getString("channelId");
-                    Log.i(TAGSTR,bindString);
+                    Log.i(TAGSTR, bindString);
                 } else {
                     bindString = "推送服务失败：" + errorCode;
                     Toast.makeText(getApplicationContext(), "推送服务失败：" + errorCode,
@@ -117,7 +89,7 @@ public class MapAct extends ActionBarActivity implements
 
                 } finally {
 //                    ((TextView) findViewById(R.id.textView2)).append(msgLine);
-                    Log.i(TAGSTR,msgLine);
+                    Log.i(TAGSTR, msgLine);
                 }
 
             } else if (intent.hasExtra("onSetTags")) {
@@ -143,6 +115,34 @@ public class MapAct extends ActionBarActivity implements
         }
 
     };
+    // 定位相
+    LocationClient mLocClient;
+    BitmapDescriptor mCurrentMarker;
+    GeoCoder mSearch = null; // 搜索模?，也可去掉地?模??立使用
+    BaiduMap mBaiduMap = null;
+    MapView mMapView = null;
+    boolean isFirstLoc = true;// 是否首次定位
+    boolean isBundle = false;// 是否首次定位
+    /*
+         * Push Relate
+         * #Push Relate
+         * @return int
+           */
+    PushApplication app;
+    Gson mGson;
+    String curMsg, CurTag;
+    CurLoc CurLocShow = new CurLoc(this);
+    LocationInfo LocInfo = new LocationInfo();
+    private LocationClientOption.LocationMode mCurrentMode;
+    private Context mcontext;
+    private LatLng CurPOI, ClientPOI;
+    private Marker mMarkerA;
+    //Preference Declare
+    private SharedPreferences settings;
+    private String data = "DATA";
+    private String UserID = "ID";
+    private String FirstTag = "FirstTag";
+    private String SecondTag = "SecondTag";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -150,24 +150,25 @@ public class MapAct extends ActionBarActivity implements
         setContentView(R.layout.activity_map);
         mcontext = getApplicationContext();
         app = PushApplication.getInstance();
-      Bundle bundle =this.getIntent().getExtras();
-        if(bundle!=null) {
-            isBundle=true;}
+        Bundle bundle = this.getIntent().getExtras();
+        if (bundle != null) {
+            isBundle = true;
+        }
         InitMap();
         InitPush();
         BitmapDescriptor bdA = BitmapDescriptorFactory
                 .fromResource(R.drawable.icon_marka);
-      if(isBundle){
+        if (isBundle) {
 
-        Double latitude = Double.parseDouble(bundle.getString("latitude"));
-        Double longtidude = Double.parseDouble(bundle.getString("longtidude"));
-        CurTag=bundle.getString("sendertag");
+            Double latitude = Double.parseDouble(bundle.getString("latitude"));
+            Double longtidude = Double.parseDouble(bundle.getString("longtidude"));
+            CurTag = bundle.getString("sendertag");
          /* notif(this,"目前位置","Latitude:"+bundle.getString("latitude")+
                   ",Longtitude"+bundle.getString("longtidude"));*/
 
-        Log.i(TAGSTR,"Latitude:"+bundle.getString("latitude"));
-          ClientPOI=new LatLng(latitude,longtidude);
-          /*MapStatusUpdate u4 = MapStatusUpdateFactory
+//            Log.i(TAGSTR, "Latitude:" + bundle.getString("latitude"));
+            ClientPOI = new LatLng(latitude, longtidude);
+            /*MapStatusUpdate u4 = MapStatusUpdateFactory
                   .newLatLng(ClientPOI);
           MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(17.0f);
 
@@ -176,20 +177,21 @@ public class MapAct extends ActionBarActivity implements
                     mBaiduMap.setMapStatus(u4);
           mBaiduMap.setMapStatus(msu);
           mLocClient.stop();*/
-          mBaiduMap.clear();
-          mBaiduMap.addOverlay(new MarkerOptions().position(ClientPOI)
-                  .icon(BitmapDescriptorFactory
-                          .fromResource(R.drawable.icon_marka)));
-          mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(ClientPOI));
-          mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-                  .location(ClientPOI));
+            mBaiduMap.clear();
+            mBaiduMap.addOverlay(new MarkerOptions().position(ClientPOI)
+                    .icon(BitmapDescriptorFactory
+                            .fromResource(R.drawable.icon_marka)));
+            mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(ClientPOI));
+            MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(17.0f);
+            mBaiduMap.setMapStatus(msu);
+            mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                    .location(ClientPOI));
         }
 
 
     }
 
-    public void InitPush()
-    {
+    public void InitPush() {
         MapBackgoundService.luanch(getApplicationContext());
 //        registerMessageCommReceiver();
         app = PushApplication.getInstance();
@@ -216,40 +218,48 @@ public class MapAct extends ActionBarActivity implements
         option.setScanSpan(1000);
         option.setProdName("Benny");
         mLocClient.setLocOption(option);
-        if(!isBundle)
-        mLocClient.start();
+        if (!isBundle)
+            mLocClient.start();
         // 初始化搜索模?，注?事件?听
         mSearch = GeoCoder.newInstance();
         mSearch.setOnGetGeoCodeResultListener(this);
     }
+
     private void registerMessageCommReceiver() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MessageReceiver.ACTION_COMMUNICATION);
         LocalBroadcastManager.getInstance(this).registerReceiver(commMapReceiver, intentFilter);
     }
+
     private void ReadPref() {
         settings = getSharedPreferences(data, 0);
         if (settings.getString(FirstTag, "") != null) {
             FirstTag = settings.getString(FirstTag, "");
-            CurTag=FirstTag;
+            CurTag = FirstTag;
         }
         if (settings.getString(SecondTag, "") != null)
             SecondTag = settings.getString(SecondTag, "");
     }
+
+    /*
+         * CurLocsendScuess(LocationInfo CurrentLoc)
+         * #
+         * @return int
+           */
     //Display Location String
     @Override
-    public void CurLocsendScuess(LocationInfo CurrentLoc)
-    {
+    public void CurLocsendScuess(LocationInfo CurrentLoc) {
 //        Log.i("getLatitude", Double.toString(CurrentLoc.getLatitude()));
-        StringBuilder sb=new StringBuilder();;
+        StringBuilder sb = new StringBuilder();
+        ;
         sb.append("RQLOC,");
-        sb.append(app.getUserId()+",");
-        sb.append(Double.toString(CurrentLoc.getLatitude())+",");
+        sb.append(app.getUserId() + ",");
+        sb.append(Double.toString(CurrentLoc.getLatitude()) + ",");
         sb.append(Double.toString(CurrentLoc.getLongitude()));
 
 
-
     }
+
     @Override
     public void sendScuess(String msg) {
         Calendar calendar = Calendar.getInstance();
@@ -275,75 +285,72 @@ public class MapAct extends ActionBarActivity implements
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             return true;
-        } else if( id == R.id.back_map) {
+        } else if (id == R.id.back_map) {
             BackMap();
-        } else if( id == R.id.check_map) {
+        } else if (id == R.id.check_map) {
             checkmap();
-        }else if( id == R.id.offlinemap) {
+        } else if (id == R.id.offlinemap) {
             Intent intent = new Intent(this, OfflineDemo.class);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
-private void checkmap()
-{
-    //Create Alert Dialogue
-    LinearLayout layout = new LinearLayout(this);
-    layout.setOrientation(LinearLayout.VERTICAL);
+
+    private void checkmap() {
+        //Create Alert Dialogue
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
 
 
-    final EditText textviewGid = new EditText(this);
-    textviewGid.setHint("以英文逗号隔开：");
-    layout.addView(textviewGid);
-    textviewGid.setText(SecondTag.toString());
-    AlertDialog.Builder builder = new AlertDialog.Builder(
-            this);
-    builder.setView(layout);
-    builder.setPositiveButton("发送",
-            new DialogInterface.OnClickListener() {
+        final EditText textviewGid = new EditText(this);
+        textviewGid.setHint("以英文逗号隔开：");
+        layout.addView(textviewGid);
+        textviewGid.setText(SecondTag.toString());
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                this);
+        builder.setView(layout);
+        builder.setPositiveButton("发送",
+                new DialogInterface.OnClickListener() {
 
 
-                public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(DialogInterface dialog, int which) {
 //                    String cuMsg="RQLOCT,"+FirstTag+","+textviewGid.getText().toString();
 //                    Log.i(TAGSTR,textviewGid.getText().toString());
-                    try
-                    {
-                    if(textviewGid.getText().toString()=="") return;
-                    String Tempstr=textviewGid.getText().toString();
+                        try {
+                            if (textviewGid.getText().toString() == "") return;
+                            String Tempstr = textviewGid.getText().toString();
 
-                    String Msg1="RQLOCT,"+FirstTag+","+Tempstr;
-                    Log.i(TAGSTR,Msg1);
-                    String UserID,CNLID=null;
-                    UserID=app.getUserId();
-                    CNLID=app.getChannelId();
-                    CurTag=textviewGid.getText().toString();
-                    Message message1 = new Message(UserID, CNLID, System.currentTimeMillis(), Msg1,Tempstr);
-                    MapSendTageCall(UserID,message1,Tempstr);
+                            String Msg1 = "RQLOCT," + FirstTag + "," + Tempstr;
+                            Log.i(TAGSTR, Msg1);
+                            String UserID, CNLID = null;
+                            UserID = app.getUserId();
+                            CNLID = app.getChannelId();
+                            CurTag = textviewGid.getText().toString();
+                            Message message1 = new Message(UserID, CNLID, System.currentTimeMillis(), Msg1, Tempstr);
+                            MapSendTageCall(UserID, message1, Tempstr);
+                        } catch (Exception E) {
+                            Log.i(TAGSTR, "Stop:" + textviewGid.getText().toString());
                         }
-                    catch(Exception E)
-                    {
-                        Log.i(TAGSTR,"Stop:"+textviewGid.getText().toString());
                     }
-                }
 
-            });
-    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            dialog.dismiss();
-        }
-    });
-    builder.show();
-}
-    public void MapSendTageCall(String userId,Message message,String Tagname)
-    {
+                });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    public void MapSendTageCall(String userId, Message message, String Tagname) {
         SendTagMsgAsyncTask task = new SendTagMsgAsyncTask(mGson.toJson(message), userId, Tagname);
         task.setOnSendTagScuessListener(this);
         task.send();
     }
-private void BackMap()
-{
+
+    private void BackMap() {
     /*final LatLng GEO_BEIJING = new LatLng(39.945, 116.404);
     ClientPOI=new LatLng(31,121);
     BitmapDescriptor bdA = BitmapDescriptorFactory
@@ -354,8 +361,9 @@ private void BackMap()
             .icon(BitmapDescriptorFactory
                     .fromResource(R.drawable.icon_marka)));
     mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(ClientPOI));*/
-    mLocClient.start();
-}
+        mLocClient.start();
+    }
+
     @Override
     protected void onPause() {
         mMapView.onPause();
@@ -412,11 +420,41 @@ private void BackMap()
                         .fromResource(R.drawable.icon_marka)));
         mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(result
                 .getLocation()));*/
-        Log.i(TAGSTR,"onGetReverseGeoCodeResult");
+        Log.i(TAGSTR, "onGetReverseGeoCodeResult");
         Toast.makeText(this, result.getAddress(),
                 Toast.LENGTH_LONG).show();
-        setTitle(FirstTag+":"+result.getAddress());
+        setTitle(FirstTag + ":" + result.getAddress());
 
+    }
+
+    private void notif(Context context, String title, String msg) {
+       /* NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+        mBuilder.setDefaults(NotificationCompat.DEFAULT_ALL);
+        mBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        mBuilder.setTicker("您有新的消息哦！");
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+        mBuilder.setContentTitle("消息");
+
+            mBuilder.setContentText(msg);
+        NotificationManager mNotifyMgr =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(1, mBuilder.build());
+        //Toast.makeText(arg0, msg.getMessage(), Toast.LENGTH_SHORT).show();*/
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(title)
+                        .setContentText(msg);
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(1, builder.build());
     }
 
     /**
@@ -457,36 +495,7 @@ private void BackMap()
             mLocClient.stop();
             mSearch.reverseGeoCode(new ReverseGeoCodeOption()
                     .location(CurPOI));
-            Log.i(TAGSTR,"mloclient Stop!");
+            Log.i(TAGSTR, "mloclient Stop!");
         }
-    }
-    private void notif(Context context,String title, String msg) {
-       /* NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-        mBuilder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        mBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        mBuilder.setTicker("您有新的消息哦！");
-        mBuilder.setSmallIcon(R.drawable.ic_launcher);
-        mBuilder.setContentTitle("消息");
-
-            mBuilder.setContentText(msg);
-        NotificationManager mNotifyMgr =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        // Builds the notification and issues it.
-        mNotifyMgr.notify(1, mBuilder.build());
-        //Toast.makeText(arg0, msg.getMessage(), Toast.LENGTH_SHORT).show();*/
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(title)
-                        .setContentText(msg);
-
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
-
-        // Add as notification
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(1, builder.build());
     }
 }
