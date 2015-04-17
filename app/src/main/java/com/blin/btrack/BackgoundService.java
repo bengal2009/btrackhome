@@ -154,12 +154,21 @@ private void FilterMSG(String MSG)
         Intent intent = new Intent(this, MapAct.class);
         Bundle bundle = new Bundle();
 //        bundle.putString("sendertag",S1[1] );
+        bundle.putString("CMD","CULOC" );
         bundle.putString("latitude",S1[2] );
         bundle.putString("longtidude",S1[3]);
         intent.putExtras(bundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
+    }else if(S1[0].equals("CHKUPD"))
+    {
+        Intent intent = new Intent(this, MapAct.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("CMD","CHKUPD" );
+        intent.putExtras(bundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }
 

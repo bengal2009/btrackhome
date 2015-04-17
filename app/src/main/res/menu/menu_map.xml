@@ -11,4 +11,6 @@
         android:orderInCategory="85" app:showAsAction="never" />
     <item android:id="@+id/checkupdate" android:title="检查更新"
         android:orderInCategory="83" app:showAsAction="never" />
+    <!--<item android:id="@+id/testupdate" android:title="测试更新"-->
+        <!--android:orderInCategory="82" app:showAsAction="never" />-->
 </menu>

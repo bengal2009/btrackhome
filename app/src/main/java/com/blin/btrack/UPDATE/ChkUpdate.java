@@ -210,6 +210,7 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
         handler.post(new Runnable() {
             public void run() {
                 pBar.cancel();
+
                 update();
             }
         });
@@ -224,7 +225,8 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
         intent.setDataAndType(Uri.fromFile(new File(Environment
                         .getExternalStorageDirectory(), UpdateConfig.UPDATE_SAVENAME)),
                 "application/vnd.android.package-archive");
-        startActivity(intent);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mcontext.startActivity(intent);
 
 
     }

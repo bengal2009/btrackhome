@@ -160,15 +160,19 @@ public class MapAct extends ActionBarActivity implements
         BitmapDescriptor bdA = BitmapDescriptorFactory
                 .fromResource(R.drawable.icon_marka);
         if (isBundle) {
-
-            Double latitude = Double.parseDouble(bundle.getString("latitude"));
-            Double longtidude = Double.parseDouble(bundle.getString("longtidude"));
-            CurTag = bundle.getString("sendertag");
+            String cmd = bundle.getString("CMD");
+            if (cmd.equals("CHKUPD")) {
+                ChkUpdate A1=new ChkUpdate();
+                A1.StartCheck(this);
+            } else if (cmd.equals("CULOC")) {
+                Double latitude = Double.parseDouble(bundle.getString("latitude"));
+                Double longtidude = Double.parseDouble(bundle.getString("longtidude"));
+                CurTag = bundle.getString("sendertag");
          /* notif(this,"目前位置","Latitude:"+bundle.getString("latitude")+
                   ",Longtitude"+bundle.getString("longtidude"));*/
 
 //            Log.i(TAGSTR, "Latitude:" + bundle.getString("latitude"));
-            ClientPOI = new LatLng(latitude, longtidude);
+                ClientPOI = new LatLng(latitude, longtidude);
             /*MapStatusUpdate u4 = MapStatusUpdateFactory
                   .newLatLng(ClientPOI);
           MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(17.0f);
@@ -178,17 +182,17 @@ public class MapAct extends ActionBarActivity implements
                     mBaiduMap.setMapStatus(u4);
           mBaiduMap.setMapStatus(msu);
           mLocClient.stop();*/
-            mBaiduMap.clear();
-            mBaiduMap.addOverlay(new MarkerOptions().position(ClientPOI)
-                    .icon(BitmapDescriptorFactory
-                            .fromResource(R.drawable.icon_marka)));
-            mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(ClientPOI));
-            MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(17.0f);
-            mBaiduMap.setMapStatus(msu);
-            mSearch.reverseGeoCode(new ReverseGeoCodeOption()
-                    .location(ClientPOI));
+                mBaiduMap.clear();
+                mBaiduMap.addOverlay(new MarkerOptions().position(ClientPOI)
+                        .icon(BitmapDescriptorFactory
+                                .fromResource(R.drawable.icon_marka)));
+                mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(ClientPOI));
+                MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(17.0f);
+                mBaiduMap.setMapStatus(msu);
+                mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                        .location(ClientPOI));
+            }
         }
-
 
     }
 
