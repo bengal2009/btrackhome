@@ -43,8 +43,9 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
          * StartCheck
          * @return int
            */
-    public void StartCheck()
+    public void StartCheck(Context context)
     {
+        mcontext=context;
         ReadJsonAsync task=new ReadJsonAsync();
         task.setOnRetriveScuessListener(this);
         task.ReadJson(UpdateConfig.UPDATE_SERVER
@@ -56,7 +57,7 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
     {
         Log.i("ReceiveScuess","MSG:"+msg );
         if (getServerVerCode(msg)) {
-            int vercode = UpdateConfig.getVerCode(this);
+            int vercode = UpdateConfig.getVerCode(mcontext);
             if (newVerCode > vercode) {
                 doNewVersionUpdate();
             } else {
@@ -89,15 +90,15 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
     }
 
     private void notNewVersionShow() {
-        int verCode = UpdateConfig.getVerCode(this);
-        String verName = UpdateConfig.getVerName(this);
+        int verCode = UpdateConfig.getVerCode(mcontext);
+        String verName = UpdateConfig.getVerName(mcontext);
         StringBuffer sb = new StringBuffer();
         sb.append("当前版本:");
         sb.append(verName);
         sb.append(" Code:");
         sb.append(verCode);
         sb.append(",\n已是最新版,无需更新!");
-        Dialog dialog = new AlertDialog.Builder(this)
+        Dialog dialog = new AlertDialog.Builder(mcontext)
                 .setTitle("软件更新").setMessage(sb.toString())// 设置内容
                 .setPositiveButton("确定",// 设置确定按钮
                         new DialogInterface.OnClickListener() {
@@ -114,8 +115,8 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
     }
 
     private void doNewVersionUpdate() {
-        int verCode = UpdateConfig.getVerCode(this);
-        String verName = UpdateConfig.getVerName(this);
+        int verCode = UpdateConfig.getVerCode(mcontext);
+        String verName = UpdateConfig.getVerName(mcontext);
         StringBuffer sb = new StringBuffer();
         sb.append("当前版本:");
         sb.append(verName);
@@ -126,7 +127,7 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
         sb.append(" Code:");
         sb.append(newVerCode);
         sb.append(", 发现新版本:");
-        Dialog dialog = new AlertDialog.Builder(this)
+        Dialog dialog = new AlertDialog.Builder(mcontext)
                 .setTitle("软件更新")
                 .setMessage(sb.toString())
                 .setPositiveButton("更新",// 设置确定按钮
@@ -135,10 +136,12 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
                             @Override
                             public void onClick(DialogInterface dialog,
                                                 int which) {
-                                pBar = new ProgressDialog(ChkUpdate.this);
+                                pBar = new ProgressDialog(mcontext);
                                 pBar.setTitle("正在下载");
                                 pBar.setMessage("请稍候...");
                                 pBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                Log.i("UodateStr:",UpdateConfig.UPDATE_SERVER
+                                        + UpdateConfig.UPDATE_APKNAME);
                                 downFile(UpdateConfig.UPDATE_SERVER
                                         + UpdateConfig.UPDATE_APKNAME);
                             }
@@ -215,11 +218,15 @@ public class ChkUpdate extends Activity implements ReadJsonAsync.OnRetriveJsonLi
 
     void update() {
 
-        Intent intent = new Intent(Intent.ACTION_VIEW);
+      Intent intent = new Intent(Intent.ACTION_VIEW);
+        Log.i("TAGSTR","Update Finish!："+Environment
+                .getExternalStorageDirectory()+ UpdateConfig.UPDATE_SAVENAME);
         intent.setDataAndType(Uri.fromFile(new File(Environment
                         .getExternalStorageDirectory(), UpdateConfig.UPDATE_SAVENAME)),
                 "application/vnd.android.package-archive");
         startActivity(intent);
+
+
     }
 
 }

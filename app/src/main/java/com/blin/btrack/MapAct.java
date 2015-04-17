@@ -295,7 +295,7 @@ public class MapAct extends ActionBarActivity implements
             startActivity(intent);
         }else if (id == R.id.checkupdate) {
             ChkUpdate A1=new ChkUpdate();
-            A1.StartCheck();
+            A1.StartCheck(this);
         }
 
 
